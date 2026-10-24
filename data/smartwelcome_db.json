@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "eventType": "person_passage",
+      "confidence": 0.92,
+      "deduplicationKey": "test-cmd-1",
+      "metadata": {},
+      "id": "evt-1792850079210-7i7m",
+      "timestamp": "2026-10-24T13:54:39.210Z",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 33
+    },
+    {
+      "id": "evt-1001",
+      "eventType": "person_passage",
+      "timestamp": "2026-10-24T11:54:32.433Z",
+      "confidence": 0.94,
+      "deduplicationKey": "passage-1792842872433",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 38,
+      "metadata": {
+        "personCategory": "unidentified_presence",
+        "confirmationMethod": "camera_presence_only",
+        "note": "Automatic camera tripwire crossing detected. Sticker reminder displayed."
+      }
+    },
+    {
+      "id": "evt-1002",
+      "eventType": "person_passage",
+      "timestamp": "2026-10-24T12:24:32.433Z",
+      "confidence": 0.88,
+      "deduplicationKey": "passage-1792844672433",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 42,
+      "metadata": {
+        "personCategory": "unidentified_presence",
+        "confirmationMethod": "camera_presence_only"
+      }
+    },
+    {
+      "id": "evt-1003",
+      "eventType": "staff_attendance_confirmed",
+      "timestamp": "2026-10-24T12:54:32.433Z",
+      "confidence": 1,
+      "deduplicationKey": "staff-confirm-1792846472433",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 35,
+      "metadata": {
+        "personCategory": "staff",
+        "personName": "Alice Johnson",
+        "department": "Engineering",
+        "confirmationMethod": "manual_self_selection",
+        "note": "Explicit self-checkin at kiosk console (non-biometric)."
+      }
+    }
+  ],
+  "devices": [
+    {
+      "deviceId": "uno-q-entrance-01",
+      "name": "Main Entrance UNO Q",
+      "ipAddress": "192.168.1.145",
+      "firmwareVersion": "1.2.0-zephyr-u585",
+      "agentVersion": "1.0.4-linux-qrb2210",
+      "status": "online",
+      "lastHeartbeat": "2026-10-24T13:54:32.432Z",
+      "lastAck": "2026-10-24T13:54:39.332Z",
+      "lastError": null,
+      "totalAcks": 25,
+      "totalEventsReceived": 25,
+      "hardwareCapabilities": {
+        "hasBuiltinLed": true,
+        "hasMatrix": true,
+        "matrixRows": 8,
+        "matrixCols": 12,
+        "supportedBridgeRpcMethods": [
+          "setLedState",
+          "displayWelcomeMatrix",
+          "getBoardTelemetry"
+        ]
+      }
+    }
+  ],
+  "people": [
+    {
+      "id": "staff-001",
+      "type": "staff",
+      "name": "Alice Johnson",
+      "identifier": "ENG-104",
+      "departmentOrCompany": "Engineering",
+      "active": true,
+      "createdAt": "2026-10-24T13:54:32.432Z"
+    },
+    {
+      "id": "staff-002",
+      "type": "staff",
+      "name": "David Chen",
+      "identifier": "OPS-210",
+      "departmentOrCompany": "Operations",
+      "active": true,
+      "createdAt": "2026-10-24T13:54:32.432Z"
+    },
+    {
+      "id": "vis-001",
+      "type": "visitor",
+      "name": "Sarah Connor",
+      "identifier": "VIS-902",
+      "departmentOrCompany": "Tech Ventures Ltd",
+      "active": true,
+      "createdAt": "2026-10-24T13:54:32.432Z"
+    }
+  ],
+  "settings": {
+    "cooldownSeconds": 5,
+    "sensitivityThreshold": 0.65,
+    "absentTimeoutSeconds": 3,
+    "cameraFrameStorageEnabled": false,
+    "eventRetentionDays": 30,
+    "localGemmaEndpoint": "http://localhost:11434",
+    "localGemmaModelName": "gemma:2b",
+    "deviceAuthToken": "uno_q_secret_token_77a9",
+    "welcomeGreetingTemplate": "Welcome! Please feel free to take an attendance gift sticker from the welcome desk."
+  },
+  "auditLogs": [
+    {
+      "id": "audit-1792850072433",
+      "timestamp": "2026-10-24T13:54:32.433Z",
+      "action": "SYSTEM_INIT",
+      "details": "SmartWelcome AI Database Initialized with persistent storage."
+    }
+  ]
+}

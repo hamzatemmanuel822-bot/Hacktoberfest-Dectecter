@@ -1,0 +1,8 @@
+{
+  "name": "SmartWelcome AI",
+  "description": "Human-presence welcome and attendance kiosk with local Gemma E2B assistance and Arduino UNO Q Wi-Fi hardware integration.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
