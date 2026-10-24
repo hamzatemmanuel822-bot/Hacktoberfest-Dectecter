@@ -463,6 +463,11 @@ app.get('/api/events', requireAdminAuth, (req: Request, res: Response) => {
   res.json(result);
 });
 
+app.delete('/api/events', requireAdminAuth, (_req: Request, res: Response) => {
+  db.clearEvents();
+  res.json({ success: true, message: 'All attendance events have been cleared.' });
+});
+
 // 3. Stats API (Protected)
 app.get('/api/stats/today', requireAdminAuth, (_req: Request, res: Response) => {
   const stats = db.getTodayStats();
@@ -541,6 +546,22 @@ app.post('/api/directory/people', requireAdminAuth, (req: Request, res: Response
   });
   db.addAuditLog('PERSON_REGISTERED', `Added ${person.type} "${person.name}" to directory.`);
   res.status(201).json(person);
+});
+
+app.delete('/api/directory/people/:id', requireAdminAuth, (req: Request, res: Response) => {
+  const { id } = req.params;
+  const deleted = db.deletePerson(id);
+  if (!deleted) {
+    res.status(404).json({ error: 'Person not found in directory.' });
+    return;
+  }
+  db.addAuditLog('PERSON_DELETED', `Removed person ID "${id}" from directory.`);
+  res.json({ success: true, message: 'Person removed from directory.' });
+});
+
+app.delete('/api/directory/people', requireAdminAuth, (_req: Request, res: Response) => {
+  db.clearPeople();
+  res.json({ success: true, message: 'All people have been removed from the directory.' });
 });
 
 app.post('/api/directory/confirm-attendance', requireAdminAuth, async (req: Request, res: Response) => {

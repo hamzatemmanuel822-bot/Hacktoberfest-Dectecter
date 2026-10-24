@@ -207,6 +207,14 @@ export const api = {
     return res.json();
   },
 
+  async clearEvents(): Promise<{ success: boolean; message: string }> {
+    const res = await fetch('/api/events', {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    return res.json();
+  },
+
   async getDevices(): Promise<DeviceInfo[]> {
     const res = await fetch('/api/devices', {
       headers: authHeaders(),
@@ -298,6 +306,22 @@ export const api = {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify(payload),
+    });
+    return res.json();
+  },
+
+  async deletePerson(id: string): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`/api/directory/people/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    return res.json();
+  },
+
+  async clearPeople(): Promise<{ success: boolean; message: string }> {
+    const res = await fetch('/api/directory/people', {
+      method: 'DELETE',
+      headers: authHeaders(),
     });
     return res.json();
   },

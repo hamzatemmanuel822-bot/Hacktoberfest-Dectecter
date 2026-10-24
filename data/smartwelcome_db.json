@@ -1,117 +1,25 @@
 {
   "version": 1,
-  "adminUsers": [],
-  "sessions": [],
-  "events": [
+  "adminUsers": [
     {
-      "eventType": "person_passage",
-      "confidence": 0.95,
-      "deduplicationKey": "test-passage-1792851876002",
-      "metadata": {
-        "personCategory": "unidentified_presence",
-        "confirmationMethod": "camera_presence_only",
-        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
-      },
-      "id": "evt-1792851876005-zc7m",
-      "timestamp": "2026-10-24T14:24:36.005Z",
-      "processingStatus": "dispatched_to_hardware"
-    },
-    {
-      "eventType": "person_passage",
-      "confidence": 0.95,
-      "deduplicationKey": "test-passage-1792851628195",
-      "metadata": {
-        "personCategory": "unidentified_presence",
-        "confirmationMethod": "camera_presence_only",
-        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
-      },
-      "id": "evt-1792851628197-ryj9",
-      "timestamp": "2026-10-24T14:20:28.197Z",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 31
-    },
-    {
-      "eventType": "person_passage",
-      "confidence": 0.95,
-      "deduplicationKey": "test-passage-1792851606368",
-      "metadata": {
-        "personCategory": "unidentified_presence",
-        "confirmationMethod": "camera_presence_only",
-        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
-      },
-      "id": "evt-1792851606370-7n0d",
-      "timestamp": "2026-10-24T14:20:06.370Z",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 25
-    },
-    {
-      "eventType": "person_passage",
-      "confidence": 0.95,
-      "deduplicationKey": "test-passage-1792851572754",
-      "metadata": {
-        "personCategory": "unidentified_presence",
-        "confirmationMethod": "camera_presence_only",
-        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
-      },
-      "id": "evt-1792851572755-18wr",
-      "timestamp": "2026-10-24T14:19:32.755Z",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 26
-    },
-    {
-      "eventType": "person_passage",
-      "confidence": 0.92,
-      "deduplicationKey": "test-cmd-1",
-      "metadata": {},
-      "id": "evt-1792850079210-7i7m",
-      "timestamp": "2026-10-24T13:54:39.210Z",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 33
-    },
-    {
-      "id": "evt-1001",
-      "eventType": "person_passage",
-      "timestamp": "2026-10-24T11:54:32.433Z",
-      "confidence": 0.94,
-      "deduplicationKey": "passage-1792842872433",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 38,
-      "metadata": {
-        "personCategory": "unidentified_presence",
-        "confirmationMethod": "camera_presence_only",
-        "note": "Automatic camera tripwire crossing detected. Sticker reminder displayed."
-      }
-    },
-    {
-      "id": "evt-1002",
-      "eventType": "person_passage",
-      "timestamp": "2026-10-24T12:24:32.433Z",
-      "confidence": 0.88,
-      "deduplicationKey": "passage-1792844672433",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 42,
-      "metadata": {
-        "personCategory": "unidentified_presence",
-        "confirmationMethod": "camera_presence_only"
-      }
-    },
-    {
-      "id": "evt-1003",
-      "eventType": "staff_attendance_confirmed",
-      "timestamp": "2026-10-24T12:54:32.433Z",
-      "confidence": 1,
-      "deduplicationKey": "staff-confirm-1792846472433",
-      "processingStatus": "acknowledged",
-      "hardwareAckLatencyMs": 35,
-      "metadata": {
-        "personCategory": "staff",
-        "personName": "Alice Johnson",
-        "department": "Engineering",
-        "confirmationMethod": "manual_self_selection",
-        "note": "Explicit self-checkin at kiosk console (non-biometric)."
-      }
+      "id": "admin-jessica-01",
+      "username": "jessica",
+      "email": "jessica@smartwelcome.local",
+      "name": "Jessica Davis",
+      "role": "superadmin",
+      "passwordHash": "scrypt$c39cf2ae801b1d67cff866fd1a00285f$ddc473744b95b61eedad715a679924cdb73c28976516769c6c50c9a03ebdeb95853be19788043e4ed016a19f82d891acce7b95cf035b01d200fae69829154f2d",
+      "createdAt": "2026-10-24T14:30:00.000Z"
     }
   ],
+  "sessions": [
+    {
+      "token": "sw_sess_6a6573736963615f64617669735f617574686f72697a65645f746f6b656e5f32303236",
+      "userId": "admin-jessica-01",
+      "createdAt": "2026-10-24T14:46:23.805Z",
+      "expiresAt": "2026-11-07T14:46:23.805Z"
+    }
+  ],
+  "events": [],
   "devices": [
     {
       "deviceId": "uno-q-entrance-01",
@@ -138,35 +46,7 @@
       }
     }
   ],
-  "people": [
-    {
-      "id": "staff-001",
-      "type": "staff",
-      "name": "Alice Johnson",
-      "identifier": "ENG-104",
-      "departmentOrCompany": "Engineering",
-      "active": true,
-      "createdAt": "2026-10-24T13:54:32.432Z"
-    },
-    {
-      "id": "staff-002",
-      "type": "staff",
-      "name": "David Chen",
-      "identifier": "OPS-210",
-      "departmentOrCompany": "Operations",
-      "active": true,
-      "createdAt": "2026-10-24T13:54:32.432Z"
-    },
-    {
-      "id": "vis-001",
-      "type": "visitor",
-      "name": "Sarah Connor",
-      "identifier": "VIS-902",
-      "departmentOrCompany": "Tech Ventures Ltd",
-      "active": true,
-      "createdAt": "2026-10-24T13:54:32.432Z"
-    }
-  ],
+  "people": [],
   "settings": {
     "cooldownSeconds": 5,
     "sensitivityThreshold": 0.65,
@@ -179,6 +59,24 @@
     "welcomeGreetingTemplate": "Welcome! Please feel free to take an attendance gift sticker from the welcome desk."
   },
   "auditLogs": [
+    {
+      "id": "audit-1792853255888",
+      "timestamp": "2026-10-24T14:47:35.888Z",
+      "action": "PEOPLE_CLEARED",
+      "details": "Directory cleared by administrator."
+    },
+    {
+      "id": "audit-1792853255876",
+      "timestamp": "2026-10-24T14:47:35.876Z",
+      "action": "PERSON_REGISTERED",
+      "details": "Added staff \"Test Staff\" to directory."
+    },
+    {
+      "id": "audit-1792853183805",
+      "timestamp": "2026-10-24T14:46:23.805Z",
+      "action": "DATABASE_INITIALIZED_CLEAN",
+      "details": "Attendance database and people directory initialized to clean empty state for administrator Jessica Davis."
+    },
     {
       "id": "audit-1792852193179",
       "timestamp": "2026-10-24T14:29:53.179Z",

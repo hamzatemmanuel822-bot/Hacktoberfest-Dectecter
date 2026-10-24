@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { UserCheck, UserPlus, Search, Building2, Check, CheckCircle2, X } from 'lucide-react';
+import { UserCheck, UserPlus, Search, Building2, Check, CheckCircle2, X, Users, Trash2, AlertCircle } from 'lucide-react';
 import { PersonRecord, PassageEvent } from '../types';
 import { api } from '../services/api';
 
@@ -30,7 +30,22 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
   const [identifier, setIdentifier] = useState<string>('');
   const [departmentOrCompany, setDepartmentOrCompany] = useState<string>('');
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleDeletePerson = async (id: string, personName: string) => {
+    setDeletingId(id);
+    try {
+      await api.deletePerson(id);
+      setSuccessMessage(`Removed ${personName} from directory.`);
+      setTimeout(() => setSuccessMessage(null), 3000);
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to delete person:', err);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const filteredPeople = people.filter((p) => {
     const matchesType = filterType === 'all' || p.type === filterType;
@@ -144,56 +159,91 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
         </div>
       </div>
 
-      {/* People Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPeople.map((person) => (
-          <div
-            key={person.id}
-            className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition"
-          >
-            <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-base font-semibold text-slate-900">{person.name}</h2>
-                  <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{person.departmentOrCompany || 'General'}</span>
+      {/* People Grid or Empty State */}
+      {filteredPeople.length === 0 ? (
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-12 text-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200/80 flex items-center justify-center mx-auto text-blue-600 mb-4 shadow-2xs">
+            <Users className="w-6 h-6 text-blue-600" />
+          </div>
+          <h3 className="text-sm font-semibold text-slate-900 mb-1">
+            {people.length === 0 ? 'No registered personnel yet' : 'No personnel found'}
+          </h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto mb-5 leading-relaxed">
+            {people.length === 0
+              ? 'The directory is completely empty. You can register staff members or frequent guests using the button below for voluntary non-biometric check-in.'
+              : 'Try clearing your search term or switching the type filter tab.'}
+          </p>
+          {people.length === 0 && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-xs"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Register First Person</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPeople.map((person) => (
+            <div
+              key={person.id}
+              className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition"
+            >
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-base font-semibold text-slate-900">{person.name}</h2>
+                    <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+                      <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{person.departmentOrCompany || 'General'}</span>
+                    </div>
                   </div>
+                  <span
+                    className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                      person.type === 'staff'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                        : 'bg-purple-50 border-purple-200 text-purple-700'
+                    }`}
+                  >
+                    {person.type}
+                  </span>
                 </div>
-                <span
-                  className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                    person.type === 'staff'
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                      : 'bg-purple-50 border-purple-200 text-purple-700'
-                  }`}
-                >
-                  {person.type}
-                </span>
+
+                {person.identifier && (
+                  <div className="text-[11px] font-mono text-slate-500">
+                    ID: <span className="text-slate-800">{person.identifier}</span>
+                  </div>
+                )}
               </div>
 
-              {person.identifier && (
-                <div className="text-[11px] font-mono text-slate-500">
-                  ID: <span className="text-slate-800">{person.identifier}</span>
+              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-slate-400 font-mono">
+                  {new Date(person.createdAt).toLocaleDateString()}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => handleDeletePerson(person.id, person.name)}
+                    disabled={deletingId === person.id}
+                    title="Remove from directory"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer disabled:opacity-40"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleQuickCheckin(person)}
+                    disabled={checkingInId === person.id}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-2xs"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>{checkingInId === person.id ? 'Logging...' : 'Check In'}</span>
+                  </button>
                 </div>
-              )}
+              </div>
             </div>
-
-            <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400 font-mono">
-                Added {new Date(person.createdAt).toLocaleDateString()}
-              </span>
-              <button
-                onClick={() => handleQuickCheckin(person)}
-                disabled={checkingInId === person.id}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-2xs"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>{checkingInId === person.id ? 'Logging...' : 'Check In'}</span>
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Registration Modal */}
       {isModalOpen && (
