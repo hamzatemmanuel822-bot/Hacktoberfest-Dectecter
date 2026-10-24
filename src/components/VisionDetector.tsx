@@ -127,15 +127,10 @@ export const VisionDetector: React.FC<VisionDetectorProps> = ({
       setLastPassageTime(now);
 
       try {
-        const response = await api.recordEvent({
+        const response = await api.recordKioskPassage({
           eventType: 'person_passage',
           confidence: Math.round(confidence * 100) / 100,
           deduplicationKey: `passage-${now}`,
-          metadata: {
-            personCategory: 'unidentified_presence',
-            confirmationMethod: 'camera_presence_only',
-            note: 'Camera tripwire passage detected. Sticker collection displayed on kiosk.',
-          },
         });
 
         if (response.event) {

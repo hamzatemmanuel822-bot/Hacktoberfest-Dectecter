@@ -52,32 +52,45 @@ SmartWelcome AI is an entrance welcome and presence detection system designed wi
 
 ---
 
-## 3. Quick Start Guide for Windows Users
+## 3. Quick Start & Administrator Portal Access
 
-### A. Run Local Gemma E2B on Windows
+### A. First-Time Launch & Master Administrator Setup
+1. Launch the application:
+   ```bash
+   npm run dev
+   ```
+2. Open your browser at `http://localhost:3000`.
+3. The **Administrator Sign-In Screen** is the mandatory landing page for all unauthenticated users.
+4. On the very first run (when zero administrator accounts exist), the portal securely prompts you to **Initialize Master Administrator**:
+   - Provide your Name, Username, Email, and a strong password (minimum 8 characters with letters and numbers).
+   - Once initialized, public administrator registration is **permanently disabled and locked** on the server.
+5. All administrative routes (`/api/events`, `/api/stats/today`, `/api/settings`, `/api/directory/*`, `/api/devices/*`) strictly require an authenticated session token.
+
+### B. Run Automated Security & Regression Tests
+To run the automated security, authentication, and duplicate suppression test suite:
+```bash
+npm run test
+```
+
+### C. Run Local Gemma E2B on Windows
 1. Open **PowerShell** or **Command Prompt** on your Windows PC:
    ```powershell
-   # Verify Ollama installation
-   ollama --version
-
-   # Download and run Gemma 2B
+   # Run Gemma 2B locally
    ollama run gemma:2b
    ```
-2. Confirm the local API is responding:
-   ```powershell
-   curl http://localhost:11434/api/tags
-   ```
-
-### B. Launch SmartWelcome AI
-The full-stack application runs using:
-```bash
-npm run dev
-```
-Open your browser at `http://localhost:3000`.
+2. Verify local connectivity in the portal under **Settings & AI Runtime**.
 
 ---
 
-## 4. Arduino UNO Q Hardware Setup
+## 4. Security Hardening & Architecture Controls
+
+- **Password Hashing:** Passwords are never stored in plaintext. They are protected using OWASP-recommended `scrypt` key derivation with cryptographically random 128-bit salts.
+- **Constant-Time Verification:** Password comparisons utilize `crypto.timingSafeEqual` to eliminate timing attacks.
+- **Brute-Force Rate Limiting:** Progressively delays and temporarily locks accounts after 5 consecutive failed attempts to protect against automated dictionary attacks.
+- **Session Security:** Cryptographically random 256-bit session tokens (`crypto.randomBytes(32)`), server-side session tracking, 12-hour session expiration, and immediate session invalidation on logout.
+- **Decoupled Kiosk Endpoints:** Public kiosk screens and tablet displays submit presence events to unprivileged, rate-limited `/api/kiosk/*` routes without exposing administrator bearer tokens or sensitive directory records.
+- **Hardware Token Authentication:** Arduino UNO Q heartbeat and ACK messages are authenticated over Wi-Fi via Bearer tokens with timing-safe comparison.
+- **Strict Privacy Guarantees:** Camera frames are strictly processed in RAM and discarded (0 bytes stored). Zero facial recognition, biometric templates, or identity guessing.
 
 ### Step 1: Connect UNO Q to Windows PC
 1. Connect the UNO Q via USB-C.

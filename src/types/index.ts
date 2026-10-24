@@ -91,3 +91,20 @@ export interface GemmaStatus {
   errorMessage?: string;
   instructionsForUser?: string;
 }
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+  role: 'superadmin' | 'admin';
+  createdAt: string;
+  lastLoginAt?: string;
+}
+
+export interface AuthSession {
+  user: AdminUser;
+  token: string;
+  expiresAt: string;
+}
+

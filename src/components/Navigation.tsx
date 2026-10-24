@@ -1,32 +1,38 @@
 /**
- * SmartWelcome AI - Top Navigation Bar
+ * SmartWelcome AI - Management Portal Navigation Bar
+ * Google & Gemini-inspired restrained visual style:
+ * Clean white background, dark charcoal text, Google blue accents, subtle borders.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   LayoutDashboard,
-  Users,
+  Tv,
   Clock,
+  Users,
   Cpu,
   Settings,
-  Tv,
+  LogOut,
+  User,
+  ExternalLink,
+  Menu,
+  X,
   Wifi,
   WifiOff,
-  Maximize2,
-  Minimize2,
 } from 'lucide-react';
-import { DeviceInfo, GemmaStatus } from '../types';
+import { DeviceInfo, GemmaStatus, AdminUser } from '../types';
 
-export type NavigationTab = 'kiosk' | 'overview' | 'people' | 'attendance' | 'devices' | 'settings';
+export type NavigationTab = 'dashboard' | 'entrance' | 'attendance' | 'people' | 'devices' | 'settings';
 
 interface NavigationProps {
   activeTab: NavigationTab;
   onTabChange: (tab: NavigationTab) => void;
   devices: DeviceInfo[];
   gemmaStatus: GemmaStatus | null;
-  isFullscreen: boolean;
-  onToggleFullscreen: () => void;
+  currentUser: AdminUser | null;
+  onSignOut: () => void;
+  onOpenPublicKiosk: () => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
@@ -34,53 +40,50 @@ export const Navigation: React.FC<NavigationProps> = ({
   onTabChange,
   devices,
   gemmaStatus,
-  isFullscreen,
-  onToggleFullscreen,
+  currentUser,
+  onSignOut,
+  onOpenPublicKiosk,
 }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isUnoQConnected = devices.some((d) => d.status === 'online');
 
   const navItems: Array<{ id: NavigationTab; label: string; icon: React.ReactNode }> = [
-    { id: 'kiosk', label: 'Entrance Kiosk', icon: <Tv className="w-4 h-4" /> },
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'entrance', label: 'Live Entrance', icon: <Tv className="w-4 h-4" /> },
+    { id: 'attendance', label: 'Attendance & Events', icon: <Clock className="w-4 h-4" /> },
     { id: 'people', label: 'People', icon: <Users className="w-4 h-4" /> },
-    { id: 'attendance', label: 'Attendance', icon: <Clock className="w-4 h-4" /> },
-    { id: 'devices', label: 'UNO Q Device', icon: <Cpu className="w-4 h-4" /> },
+    { id: 'devices', label: 'Devices', icon: <Cpu className="w-4 h-4" /> },
     { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Brand */}
+        {/* Brand & Wordmark */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-indigo-950">
-            <Sparkles className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
+            <Sparkles className="w-4 h-4" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-white text-base tracking-tight">SmartWelcome</span>
-              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
-                AI
-              </span>
-            </div>
-            <div className="text-[10px] text-slate-400 font-mono hidden sm:block">
-              Gemma E2B • Arduino UNO Q
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-slate-900 text-base tracking-tight">SmartWelcome</span>
+            <span className="text-[10px] font-medium font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/80">
+              Admin Portal
+            </span>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
               >
                 {item.icon}
@@ -90,63 +93,115 @@ export const Navigation: React.FC<NavigationProps> = ({
           })}
         </nav>
 
-        {/* Status Indicators & Fullscreen */}
+        {/* Right Side Controls & Administrator Account */}
         <div className="flex items-center gap-2.5">
-          {/* Arduino UNO Q status indicator */}
+          {/* Hardware Telemetry Badge */}
           <div
             title={`Arduino UNO Q: ${isUnoQConnected ? 'Online over Wi-Fi' : 'Offline'}`}
-            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border ${
-              isUnoQConnected
-                ? 'bg-teal-500/10 text-teal-300 border-teal-500/30'
-                : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
-            }`}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-slate-200 bg-slate-50 text-slate-700"
           >
-            {isUnoQConnected ? <Wifi className="w-3 h-3 text-teal-400" /> : <WifiOff className="w-3 h-3 text-rose-400" />}
+            <span className={`w-2 h-2 rounded-full ${isUnoQConnected ? 'bg-emerald-500' : 'bg-slate-400'}`} />
             <span>UNO Q</span>
           </div>
 
-          {/* Local Gemma E2B status indicator */}
+          {/* Local Gemma E2B Badge */}
           <div
-            title={`Local Gemma E2B: ${gemmaStatus?.status === 'connected' ? 'Connected' : 'Offline / Standby'}`}
-            className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border ${
-              gemmaStatus?.status === 'connected'
-                ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
-                : 'bg-slate-800 text-slate-400 border-slate-700'
-            }`}
+            title={`Local Gemma E2B: ${gemmaStatus?.status === 'connected' ? 'Connected' : 'Standby / Offline'}`}
+            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-slate-200 bg-slate-50 text-slate-700"
           >
-            <Sparkles className="w-3 h-3 text-indigo-400" />
+            <span
+              className={`w-2 h-2 rounded-full ${
+                gemmaStatus?.status === 'connected' ? 'bg-blue-600' : 'bg-slate-400'
+              }`}
+            />
             <span>Gemma 2B</span>
           </div>
 
-          {/* Fullscreen Kiosk Mode Toggle */}
+          {/* Launch Public Kiosk Button */}
           <button
-            onClick={onToggleFullscreen}
-            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Kiosk Fullscreen'}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition cursor-pointer"
+            onClick={onOpenPublicKiosk}
+            title="Open Public Entrance Kiosk (Zero Admin Access)"
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-blue-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition shadow-2xs cursor-pointer"
           >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            <Tv className="w-3.5 h-3.5 text-slate-500" />
+            <span>Kiosk Mode</span>
+          </button>
+
+          {/* Administrator Profile Chip */}
+          <div className="flex items-center gap-2 pl-1 border-l border-slate-200">
+            <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-xs font-semibold">
+              {currentUser?.name?.charAt(0).toUpperCase() || <User className="w-3.5 h-3.5" />}
+            </div>
+            <div className="hidden sm:block text-left">
+              <div className="text-xs font-semibold text-slate-900 leading-tight">
+                {currentUser?.name || currentUser?.username || 'Administrator'}
+              </div>
+              <div className="text-[10px] text-slate-500 capitalize">{currentUser?.role || 'Admin'}</div>
+            </div>
+
+            {/* Sign Out Button */}
+            <button
+              onClick={onSignOut}
+              title="Sign Out of Portal"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation bar */}
-      <div className="md:hidden flex items-center justify-around border-t border-slate-800 bg-slate-950/80 px-2 py-1.5 overflow-x-auto">
-        {navItems.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
+      {/* Mobile Collapsible Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-1">
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onTabChange(item.id);
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
+                  isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
             <button
-              key={item.id}
-              onClick={() => onTabChange(item.id)}
-              className={`flex flex-col items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium transition cursor-pointer whitespace-nowrap ${
-                isActive ? 'text-indigo-400 font-bold' : 'text-slate-400'
-              }`}
+              onClick={() => {
+                onOpenPublicKiosk();
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-1.5 text-blue-600 font-medium py-1.5 cursor-pointer"
             >
-              {item.icon}
-              <span>{item.label}</span>
+              <Tv className="w-4 h-4" />
+              <span>Launch Entrance Kiosk View</span>
             </button>
-          );
-        })}
-      </div>
+            <button
+              onClick={onSignOut}
+              className="flex items-center gap-1.5 text-rose-600 font-medium py-1.5 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

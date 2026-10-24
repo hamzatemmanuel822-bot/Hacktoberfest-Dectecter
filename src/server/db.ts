@@ -69,8 +69,30 @@ export interface SystemSettings {
   welcomeGreetingTemplate: string;
 }
 
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  passwordHash: string;
+  name: string;
+  role: 'superadmin' | 'admin';
+  createdAt: string;
+  lastLoginAt?: string;
+}
+
+export interface SessionRecord {
+  token: string;
+  userId: string;
+  createdAt: string;
+  expiresAt: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
 interface DatabaseSchema {
   version: number;
+  adminUsers: AdminUser[];
+  sessions: SessionRecord[];
   events: PassageEvent[];
   devices: DeviceInfo[];
   people: PersonRecord[];
@@ -170,6 +192,8 @@ class Database {
         // Ensure all required fields exist
         return {
           version: parsed.version || 1,
+          adminUsers: parsed.adminUsers || [],
+          sessions: parsed.sessions || [],
           events: parsed.events || [],
           devices: parsed.devices && parsed.devices.length ? parsed.devices : DEFAULT_DEVICES,
           people: parsed.people && parsed.people.length ? parsed.people : DEFAULT_PEOPLE,
@@ -183,6 +207,8 @@ class Database {
 
     const initialData: DatabaseSchema = {
       version: 1,
+      adminUsers: [],
+      sessions: [],
       events: this.generateInitialEvents(),
       devices: DEFAULT_DEVICES,
       people: DEFAULT_PEOPLE,
@@ -489,6 +515,104 @@ class Database {
     };
     this.save();
     return this.data.settings;
+  }
+
+  // --- Admin User & Session Security ---
+  public hasAdminUsers(): boolean {
+    return this.data.adminUsers.length > 0;
+  }
+
+  public getAdminUsers(): Omit<AdminUser, 'passwordHash'>[] {
+    return this.data.adminUsers.map(({ passwordHash: _, ...rest }) => rest);
+  }
+
+  public getAdminUserByUsername(usernameOrEmail: string): AdminUser | null {
+    const normalized = usernameOrEmail.trim().toLowerCase();
+    return (
+      this.data.adminUsers.find(
+        (u) => u.username.toLowerCase() === normalized || u.email.toLowerCase() === normalized
+      ) || null
+    );
+  }
+
+  public getAdminUserById(id: string): Omit<AdminUser, 'passwordHash'> | null {
+    const user = this.data.adminUsers.find((u) => u.id === id);
+    if (!user) return null;
+    const { passwordHash: _, ...safe } = user;
+    return safe;
+  }
+
+  public createAdminUser(data: Omit<AdminUser, 'id' | 'createdAt'>): Omit<AdminUser, 'passwordHash'> {
+    const newUser: AdminUser = {
+      ...data,
+      id: `admin-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.data.adminUsers.push(newUser);
+    this.addAuditLog('ADMIN_USER_CREATED', `Administrator account "${newUser.username}" created with role "${newUser.role}".`);
+    this.save();
+    const { passwordHash: _, ...safe } = newUser;
+    return safe;
+  }
+
+  public updateAdminLastLogin(userId: string) {
+    const user = this.data.adminUsers.find((u) => u.id === userId);
+    if (user) {
+      user.lastLoginAt = new Date().toISOString();
+      this.save();
+    }
+  }
+
+  public createSession(userId: string, ipAddress?: string, userAgent?: string): SessionRecord {
+    // 12-hour session lifetime
+    const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+    const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
+    const session: SessionRecord = {
+      token,
+      userId,
+      createdAt: new Date().toISOString(),
+      expiresAt,
+      ipAddress,
+      userAgent: userAgent ? userAgent.substring(0, 200) : undefined,
+    };
+
+    // Clean up expired sessions
+    const nowMs = Date.now();
+    this.data.sessions = this.data.sessions.filter((s) => new Date(s.expiresAt).getTime() > nowMs);
+    this.data.sessions.push(session);
+    this.save();
+    return session;
+  }
+
+  public getSession(token: string): { session: SessionRecord; user: Omit<AdminUser, 'passwordHash'> } | null {
+    if (!token) return null;
+    const session = this.data.sessions.find((s) => s.token === token);
+    if (!session) return null;
+
+    if (new Date(session.expiresAt).getTime() <= Date.now()) {
+      this.revokeSession(token);
+      return null;
+    }
+
+    const user = this.getAdminUserById(session.userId);
+    if (!user) return null;
+
+    return { session, user };
+  }
+
+  public revokeSession(token: string): boolean {
+    const initialLen = this.data.sessions.length;
+    this.data.sessions = this.data.sessions.filter((s) => s.token !== token);
+    if (this.data.sessions.length !== initialLen) {
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
+  public revokeAllUserSessions(userId: string) {
+    this.data.sessions = this.data.sessions.filter((s) => s.userId !== userId);
+    this.save();
   }
 
   // --- Audit Logs ---

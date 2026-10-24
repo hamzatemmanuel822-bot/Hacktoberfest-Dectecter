@@ -1,23 +1,28 @@
 /**
  * SmartWelcome AI - Main Application
+ * Admin Sign-In Landing Page with Google/Gemini-inspired Portal
  * Human-presence welcome and attendance system with local Gemma E2B intelligence
  * and Arduino UNO Q Wi-Fi hardware integration.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navigation, NavigationTab } from './components/Navigation';
+import { AdminSignIn } from './components/AdminSignIn';
 import { KioskView } from './components/KioskView';
 import { OverviewView } from './components/OverviewView';
 import { AttendanceView } from './components/AttendanceView';
 import { PeopleView } from './components/PeopleView';
 import { DevicesView } from './components/DevicesView';
 import { SettingsView } from './components/SettingsView';
-import { PassageEvent, DeviceInfo, PersonRecord, SystemSettings, TodayStats, GemmaStatus } from './types';
-import { api } from './services/api';
+import { PassageEvent, DeviceInfo, PersonRecord, SystemSettings, TodayStats, GemmaStatus, AdminUser } from './types';
+import { api, authStorage } from './services/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<NavigationTab>('kiosk');
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  // Authentication & View State
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+  const [showStandaloneKiosk, setShowStandaloneKiosk] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<NavigationTab>('dashboard');
 
   // Core Data State
   const [events, setEvents] = useState<PassageEvent[]>([]);
@@ -27,8 +32,36 @@ export default function App() {
   const [settings, setSettings] = useState<SystemSettings | null>(null);
   const [gemmaStatus, setGemmaStatus] = useState<GemmaStatus | null>(null);
 
-  // Load all initial data
+  // Check initial authentication
+  useEffect(() => {
+    let mounted = true;
+    api
+      .getCurrentUser()
+      .then((res) => {
+        if (mounted) {
+          if (res.authenticated && res.user) {
+            setCurrentUser(res.user);
+          } else {
+            setCurrentUser(null);
+          }
+          setIsCheckingAuth(false);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setCurrentUser(null);
+          setIsCheckingAuth(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Load all initial data once authenticated
   const loadData = useCallback(async () => {
+    if (!currentUser) return;
     try {
       const [statsData, eventsData, devicesData, peopleData, settingsData, gemmaData] = await Promise.allSettled([
         api.getTodayStats(),
@@ -48,14 +81,18 @@ export default function App() {
     } catch (err) {
       console.warn('Initial data load error:', err);
     }
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (currentUser) {
+      loadData();
+    }
+  }, [currentUser, loadData]);
 
   // Connect to Real-time SSE Live Event Stream
   useEffect(() => {
+    if (!currentUser) return;
+
     const unsubscribe = api.subscribeToLiveEvents((msg) => {
       if (msg.type === 'NEW_EVENT' && msg.event) {
         const newEv = msg.event as PassageEvent;
@@ -78,65 +115,99 @@ export default function App() {
         const latencyMs = msg.latencyMs as number;
         if (eventId) {
           setEvents((prev) =>
-            prev.map((e) => (e.id === eventId ? { ...e, processingStatus: 'acknowledged', hardwareAckLatencyMs: latencyMs } : e))
+            prev.map((e) =>
+              e.id === eventId
+                ? { ...e, processingStatus: 'acknowledged', hardwareAckLatencyMs: latencyMs }
+                : e
+            )
           );
         }
       } else if (msg.type === 'DEVICE_HEARTBEAT') {
-        api.getDevices().then((devs) => setDevices(devs));
+        api.getDevices().then((devs) => setDevices(devs)).catch(() => {});
       }
     });
 
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [currentUser]);
 
-  // Event creation handler
+  // Event handlers
   const handleEventCreated = (event: PassageEvent) => {
     setEvents((prev) => [event, ...prev.filter((e) => e.id !== event.id)]);
-    api.getTodayStats().then(setTodayStats);
+    if (currentUser) {
+      api.getTodayStats().then(setTodayStats).catch(() => {});
+    }
   };
 
   const handlePersonAdded = (person: PersonRecord) => {
     setPeople((prev) => [...prev, person]);
   };
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
-      setIsFullscreen(false);
-    }
+  const handleAuthenticated = (user: AdminUser) => {
+    setCurrentUser(user);
+    setShowStandaloneKiosk(false);
+    setActiveTab('dashboard');
   };
 
+  const handleSignOut = async () => {
+    await api.logout();
+    setCurrentUser(null);
+    setShowStandaloneKiosk(false);
+  };
+
+  // If checking authentication on load, show minimal loading spinner
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Standalone Public Entrance Kiosk Mode (for tablet screens / visitors)
+  if (showStandaloneKiosk) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 sm:p-6 lg:p-8">
+        <KioskView
+          onEventCreated={handleEventCreated}
+          devices={devices}
+          gemmaStatus={gemmaStatus}
+          latestEvent={events[0] || null}
+          isStandaloneKiosk={true}
+          onExitKiosk={() => setShowStandaloneKiosk(false)}
+        />
+      </div>
+    );
+  }
+
+  // 1. Mandatory Rule: Admin Sign-In is the Landing Page for unauthenticated users
+  if (!currentUser) {
+    return (
+      <AdminSignIn
+        onAuthenticated={handleAuthenticated}
+        onOpenKiosk={() => setShowStandaloneKiosk(true)}
+      />
+    );
+  }
+
+  // 2. Protected Administration Portal (Google & Gemini-inspired)
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
-      {/* Top Header Navigation */}
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+      {/* Top Persistent Navigation Header */}
       <Navigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
         devices={devices}
         gemmaStatus={gemmaStatus}
-        isFullscreen={isFullscreen}
-        onToggleFullscreen={toggleFullscreen}
+        currentUser={currentUser}
+        onSignOut={handleSignOut}
+        onOpenPublicKiosk={() => setShowStandaloneKiosk(true)}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-        {activeTab === 'kiosk' && (
-          <KioskView
-            onEventCreated={handleEventCreated}
-            devices={devices}
-            gemmaStatus={gemmaStatus}
-            latestEvent={events[0] || null}
-          />
-        )}
-
-        {activeTab === 'overview' && (
+        {activeTab === 'dashboard' && (
           <OverviewView
             stats={todayStats}
             latestEvents={events}
@@ -146,6 +217,18 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'entrance' && (
+          <KioskView
+            onEventCreated={handleEventCreated}
+            devices={devices}
+            gemmaStatus={gemmaStatus}
+            latestEvent={events[0] || null}
+            isStandaloneKiosk={false}
+          />
+        )}
+
+        {activeTab === 'attendance' && <AttendanceView events={events} onRefresh={loadData} />}
+
         {activeTab === 'people' && (
           <PeopleView
             people={people}
@@ -154,8 +237,6 @@ export default function App() {
             onRefresh={loadData}
           />
         )}
-
-        {activeTab === 'attendance' && <AttendanceView events={events} onRefresh={loadData} />}
 
         {activeTab === 'devices' && <DevicesView devices={devices} onRefresh={loadData} />}
 
@@ -169,17 +250,19 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-4 px-6 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <span>SmartWelcome AI System v1.0.0</span>
-          <span>•</span>
-          <span className="text-slate-400">Qualcomm QRB2210 + STM32U585</span>
-          <span>•</span>
-          <span className="text-slate-400">Gemma E2B</span>
-        </div>
-        <div>
-          <span>Non-Biometric Tripwire &amp; Presence Counting • Strictly Zero Frame Retention</span>
+      {/* Clean Enterprise Footer */}
+      <footer className="border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-slate-700">SmartWelcome AI v1.1.0</span>
+            <span>•</span>
+            <span>Qualcomm QRB2210 + STM32U585</span>
+            <span>•</span>
+            <span>Local Gemma E2B</span>
+          </div>
+          <div>
+            <span>Non-Biometric Tripwire Presence • Strictly Zero Frame Retention • Hardened RBAC</span>
+          </div>
         </div>
       </footer>
     </div>

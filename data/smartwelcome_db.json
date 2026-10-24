@@ -1,6 +1,63 @@
 {
   "version": 1,
+  "adminUsers": [],
+  "sessions": [],
   "events": [
+    {
+      "eventType": "person_passage",
+      "confidence": 0.95,
+      "deduplicationKey": "test-passage-1792851876002",
+      "metadata": {
+        "personCategory": "unidentified_presence",
+        "confirmationMethod": "camera_presence_only",
+        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
+      },
+      "id": "evt-1792851876005-zc7m",
+      "timestamp": "2026-10-24T14:24:36.005Z",
+      "processingStatus": "dispatched_to_hardware"
+    },
+    {
+      "eventType": "person_passage",
+      "confidence": 0.95,
+      "deduplicationKey": "test-passage-1792851628195",
+      "metadata": {
+        "personCategory": "unidentified_presence",
+        "confirmationMethod": "camera_presence_only",
+        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
+      },
+      "id": "evt-1792851628197-ryj9",
+      "timestamp": "2026-10-24T14:20:28.197Z",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 31
+    },
+    {
+      "eventType": "person_passage",
+      "confidence": 0.95,
+      "deduplicationKey": "test-passage-1792851606368",
+      "metadata": {
+        "personCategory": "unidentified_presence",
+        "confirmationMethod": "camera_presence_only",
+        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
+      },
+      "id": "evt-1792851606370-7n0d",
+      "timestamp": "2026-10-24T14:20:06.370Z",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 25
+    },
+    {
+      "eventType": "person_passage",
+      "confidence": 0.95,
+      "deduplicationKey": "test-passage-1792851572754",
+      "metadata": {
+        "personCategory": "unidentified_presence",
+        "confirmationMethod": "camera_presence_only",
+        "note": "Camera tripwire crossing detected. Physical gift sticker reminder displayed."
+      },
+      "id": "evt-1792851572755-18wr",
+      "timestamp": "2026-10-24T14:19:32.755Z",
+      "processingStatus": "acknowledged",
+      "hardwareAckLatencyMs": 26
+    },
     {
       "eventType": "person_passage",
       "confidence": 0.92,
@@ -64,9 +121,9 @@
       "agentVersion": "1.0.4-linux-qrb2210",
       "status": "online",
       "lastHeartbeat": "2026-10-24T13:54:32.432Z",
-      "lastAck": "2026-10-24T13:54:39.332Z",
+      "lastAck": "2026-10-24T14:20:28.319Z",
       "lastError": null,
-      "totalAcks": 25,
+      "totalAcks": 28,
       "totalEventsReceived": 25,
       "hardwareCapabilities": {
         "hasBuiltinLed": true,
@@ -122,6 +179,54 @@
     "welcomeGreetingTemplate": "Welcome! Please feel free to take an attendance gift sticker from the welcome desk."
   },
   "auditLogs": [
+    {
+      "id": "audit-1792852193179",
+      "timestamp": "2026-10-24T14:29:53.179Z",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "details": "Administrator \"admin\" signed in successfully."
+    },
+    {
+      "id": "audit-1792852188851",
+      "timestamp": "2026-10-24T14:29:48.851Z",
+      "action": "ADMIN_USER_CREATED",
+      "details": "Administrator account \"admin\" created with role \"superadmin\"."
+    },
+    {
+      "id": "audit-1792851875999",
+      "timestamp": "2026-10-24T14:24:35.999Z",
+      "action": "AUTH_LOGIN_FAILED",
+      "details": "Failed sign-in attempt for username \"sec_admin_1792851875904\" from IP 127.0.0.1."
+    },
+    {
+      "id": "audit-1792851628174",
+      "timestamp": "2026-10-24T14:20:28.174Z",
+      "action": "AUTH_LOGIN_FAILED",
+      "details": "Failed sign-in attempt for username \"sec_admin_1792851628098\" from IP 127.0.0.1."
+    },
+    {
+      "id": "audit-1792851606365",
+      "timestamp": "2026-10-24T14:20:06.365Z",
+      "action": "AUTH_LOGIN_FAILED",
+      "details": "Failed sign-in attempt for username \"sec_admin_1792851606280\" from IP 127.0.0.1."
+    },
+    {
+      "id": "audit-1792851572746",
+      "timestamp": "2026-10-24T14:19:32.746Z",
+      "action": "AUTH_LOGIN_SUCCESS",
+      "details": "Administrator \"sec_admin_1792851572499\" signed in successfully."
+    },
+    {
+      "id": "audit-1792851572676",
+      "timestamp": "2026-10-24T14:19:32.676Z",
+      "action": "AUTH_LOGIN_FAILED",
+      "details": "Failed sign-in attempt for username \"sec_admin_1792851572499\" from IP 127.0.0.1."
+    },
+    {
+      "id": "audit-1792851572606",
+      "timestamp": "2026-10-24T14:19:32.606Z",
+      "action": "ADMIN_USER_CREATED",
+      "details": "Administrator account \"sec_admin_1792851572499\" created with role \"superadmin\"."
+    },
     {
       "id": "audit-1792850072433",
       "timestamp": "2026-10-24T13:54:32.433Z",

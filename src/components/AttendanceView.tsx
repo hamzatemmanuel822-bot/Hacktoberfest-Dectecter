@@ -1,11 +1,12 @@
 /**
  * SmartWelcome AI - Attendance & Event History View
+ * Visual Design: Google & Gemini-inspired clean enterprise style
  * Searchable, filterable audit log of presence events, non-biometric confirmations,
  * and hardware acknowledgements with CSV/JSON export.
  */
 
 import React, { useState } from 'react';
-import { Search, Download, Filter, Calendar, CheckCircle2, Clock, Cpu, UserCheck, ShieldAlert } from 'lucide-react';
+import { Search, Download, Clock, UserCheck, CheckCircle2 } from 'lucide-react';
 import { PassageEvent } from '../types';
 
 interface AttendanceViewProps {
@@ -85,34 +86,34 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
     switch (type) {
       case 'person_passage':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">
-            <Clock className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+            <Clock className="w-3 h-3 text-blue-600" />
             Person Passage
           </span>
         );
       case 'staff_attendance_confirmed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-            <UserCheck className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <UserCheck className="w-3 h-3 text-emerald-600" />
             Staff Confirmed
           </span>
         );
       case 'visitor_attendance_confirmed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30">
-            <CheckCircle2 className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+            <CheckCircle2 className="w-3 h-3 text-purple-600" />
             Visitor Confirmed
           </span>
         );
       case 'person_detected':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
             Presence Frame
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-400">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
             {type}
           </span>
         );
@@ -124,8 +125,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Attendance & Event History</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Attendance &amp; Event History</h1>
+          <p className="text-xs text-slate-500">
             Audit-grade record of passage events, explicit non-biometric check-ins, and UNO Q hardware acks.
           </p>
         </div>
@@ -133,23 +134,23 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
         <div className="flex items-center gap-2">
           <button
             onClick={exportCsv}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 transition flex items-center gap-2 cursor-pointer"
+            className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 shadow-2xs transition flex items-center gap-2 cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Export CSV</span>
           </button>
           <button
             onClick={exportJson}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 transition flex items-center gap-2 cursor-pointer"
+            className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 shadow-2xs transition flex items-center gap-2 cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Export JSON</span>
           </button>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-lg">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
         {/* Search */}
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -158,11 +159,11 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
             placeholder="Search by event ID, name, department..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
           />
         </div>
 
-        {/* Filter Pills */}
+        {/* Filter Tabs */}
         <div className="flex flex-wrap gap-1.5 w-full md:w-auto">
           {[
             { id: 'all', label: 'All Records' },
@@ -175,8 +176,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
               onClick={() => setFilterType(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
                 filterType === tab.id
-                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm'
-                  : 'bg-slate-800 border-slate-750 text-slate-300 hover:bg-slate-750'
+                  ? 'bg-blue-50 border-blue-200 text-blue-700 font-semibold'
+                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
               {tab.label}
@@ -186,47 +187,47 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+      <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
+            <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider text-[11px] border-b border-slate-200">
               <tr>
-                <th className="px-5 py-3 font-semibold">Event ID</th>
-                <th className="px-5 py-3 font-semibold">Type</th>
-                <th className="px-5 py-3 font-semibold">Timestamp</th>
-                <th className="px-5 py-3 font-semibold">Person / Category</th>
-                <th className="px-5 py-3 font-semibold">Method</th>
-                <th className="px-5 py-3 font-semibold">UNO Q Status</th>
-                <th className="px-5 py-3 font-semibold">Latency</th>
+                <th className="px-5 py-3.5 font-medium">Event ID</th>
+                <th className="px-5 py-3.5 font-medium">Type</th>
+                <th className="px-5 py-3.5 font-medium">Timestamp</th>
+                <th className="px-5 py-3.5 font-medium">Person / Category</th>
+                <th className="px-5 py-3.5 font-medium">Method</th>
+                <th className="px-5 py-3.5 font-medium">UNO Q Status</th>
+                <th className="px-5 py-3.5 font-medium">Latency</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-slate-100">
               {filteredEvents.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-5 py-12 text-center text-slate-400">
                     No matching events found.
                   </td>
                 </tr>
               ) : (
                 filteredEvents.map((e) => (
-                  <tr key={e.id} className="hover:bg-slate-800/40 transition">
-                    <td className="px-5 py-3.5 font-mono text-slate-300 whitespace-nowrap">{e.id}</td>
+                  <tr key={e.id} className="hover:bg-slate-50/70 transition">
+                    <td className="px-5 py-3.5 font-mono text-slate-600 whitespace-nowrap">{e.id}</td>
                     <td className="px-5 py-3.5 whitespace-nowrap">{getEventBadge(e.eventType)}</td>
-                    <td className="px-5 py-3.5 text-slate-300 whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-slate-700 whitespace-nowrap">
                       <div>{new Date(e.timestamp).toLocaleTimeString()}</div>
-                      <div className="text-[10px] text-slate-500">{new Date(e.timestamp).toLocaleDateString()}</div>
+                      <div className="text-[10px] text-slate-400">{new Date(e.timestamp).toLocaleDateString()}</div>
                     </td>
                     <td className="px-5 py-3.5">
                       {e.metadata?.personName ? (
                         <div>
-                          <div className="font-semibold text-white">{e.metadata.personName}</div>
-                          <div className="text-[10px] text-slate-400">{e.metadata.department || 'General'}</div>
+                          <div className="font-medium text-slate-900">{e.metadata.personName}</div>
+                          <div className="text-[10px] text-slate-500">{e.metadata.department || 'General'}</div>
                         </div>
                       ) : (
                         <span className="text-slate-400 italic">Unidentified human passage</span>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 text-slate-400 font-mono text-[11px]">
+                    <td className="px-5 py-3.5 text-slate-600 font-mono text-[11px]">
                       {e.metadata?.confirmationMethod === 'manual_self_selection'
                         ? 'Self-Entry'
                         : 'Tripwire (Optic)'}
@@ -235,15 +236,15 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
                           e.processingStatus === 'acknowledged'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-amber-50 text-amber-700 border border-amber-200'
                         }`}
                       >
                         <CheckCircle2 className="w-3 h-3" />
                         {e.processingStatus}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 font-mono text-slate-300">
+                    <td className="px-5 py-3.5 font-mono text-slate-600">
                       {e.hardwareAckLatencyMs ? `${e.hardwareAckLatencyMs} ms` : '—'}
                     </td>
                   </tr>
