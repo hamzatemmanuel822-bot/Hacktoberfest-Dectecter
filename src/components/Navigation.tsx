@@ -15,13 +15,12 @@ import {
   Settings,
   LogOut,
   User,
-  ExternalLink,
   Menu,
   X,
-  Wifi,
-  WifiOff,
 } from 'lucide-react';
 import { DeviceInfo, GemmaStatus, AdminUser } from '../types';
+import { Badge } from './ui/Badge';
+import { Button } from './ui/Button';
 
 export type NavigationTab = 'dashboard' | 'entrance' | 'attendance' | 'people' | 'devices' | 'settings';
 
@@ -66,9 +65,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-900 text-base tracking-tight">SmartWelcome</span>
-            <span className="text-[10px] font-medium font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/80">
-              Admin Portal
-            </span>
+            <Badge variant="info">Admin Portal</Badge>
           </div>
         </div>
 
@@ -95,22 +92,22 @@ export const Navigation: React.FC<NavigationProps> = ({
 
         {/* Right Side Controls & Administrator Account */}
         <div className="flex items-center gap-2.5">
-          {/* Hardware Telemetry Badge */}
+          {/* Hardware Telemetry Badge (Unboxed with dot indicator - zero pill discipline) */}
           <div
             title={`Arduino UNO Q: ${isUnoQConnected ? 'Online over Wi-Fi' : 'Offline'}`}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-slate-200 bg-slate-50 text-slate-700"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono border border-slate-200 bg-slate-50 text-slate-700"
           >
-            <span className={`w-2 h-2 rounded-full ${isUnoQConnected ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isUnoQConnected ? 'bg-emerald-500' : 'bg-slate-400'}`} />
             <span>UNO Q</span>
           </div>
 
           {/* Local Gemma E2B Badge */}
           <div
             title={`Local Gemma E2B: ${gemmaStatus?.status === 'connected' ? 'Connected' : 'Standby / Offline'}`}
-            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-slate-200 bg-slate-50 text-slate-700"
+            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono border border-slate-200 bg-slate-50 text-slate-700"
           >
             <span
-              className={`w-2 h-2 rounded-full ${
+              className={`w-1.5 h-1.5 rounded-full ${
                 gemmaStatus?.status === 'connected' ? 'bg-blue-600' : 'bg-slate-400'
               }`}
             />
@@ -118,18 +115,20 @@ export const Navigation: React.FC<NavigationProps> = ({
           </div>
 
           {/* Launch Public Kiosk Button */}
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onOpenPublicKiosk}
             title="Open Public Entrance Kiosk (Zero Admin Access)"
-            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-blue-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition shadow-2xs cursor-pointer"
+            className="hidden md:inline-flex"
           >
             <Tv className="w-3.5 h-3.5 text-slate-500" />
             <span>Kiosk Mode</span>
-          </button>
+          </Button>
 
           {/* Administrator Profile Chip */}
-          <div className="flex items-center gap-2 pl-1 border-l border-slate-200">
-            <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-xs font-semibold">
+          <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+            <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 text-xs font-semibold">
               {currentUser?.name?.charAt(0).toUpperCase() || <User className="w-3.5 h-3.5" />}
             </div>
             <div className="hidden sm:block text-left">
@@ -140,13 +139,15 @@ export const Navigation: React.FC<NavigationProps> = ({
             </div>
 
             {/* Sign Out Button */}
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onSignOut}
               title="Sign Out of Portal"
-              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+              className="text-slate-500 hover:text-rose-600 hover:bg-rose-50"
             >
               <LogOut className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
 
           {/* Mobile Menu Toggle Button */}

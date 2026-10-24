@@ -20,12 +20,14 @@ import {
   X,
   ArrowRight,
   UserPlus,
-  Tv,
   ArrowLeft,
 } from 'lucide-react';
 import { VisionDetector } from './VisionDetector';
 import { PassageEvent, DeviceInfo, GemmaStatus } from '../types';
 import { api } from '../services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Input } from './ui/Input';
 
 interface KioskViewProps {
   onEventCreated: (event: PassageEvent) => void;
@@ -39,7 +41,6 @@ interface KioskViewProps {
 export const KioskView: React.FC<KioskViewProps> = ({
   onEventCreated,
   devices,
-  gemmaStatus,
   latestEvent,
   isStandaloneKiosk = false,
   onExitKiosk,
@@ -47,7 +48,6 @@ export const KioskView: React.FC<KioskViewProps> = ({
   const [welcomeGreeting, setWelcomeGreeting] = useState<string>(
     'Welcome! Please feel free to take an attendance gift sticker from the welcome table.'
   );
-  const [greetingSource, setGreetingSource] = useState<'local_gemma_e2b' | 'fallback_template'>('fallback_template');
   const [isCheckinModalOpen, setIsCheckinModalOpen] = useState<boolean>(false);
   const [checkinType, setCheckinType] = useState<'staff' | 'visitor'>('visitor');
   const [personName, setPersonName] = useState<string>('');
@@ -113,13 +113,14 @@ export const KioskView: React.FC<KioskViewProps> = ({
             <span>Public Entrance Kiosk Active</span>
           </div>
           {onExitKiosk && (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={onExitKiosk}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-blue-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Return to Admin Sign In</span>
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -128,10 +129,10 @@ export const KioskView: React.FC<KioskViewProps> = ({
       <div className="relative overflow-hidden bg-white p-6 md:p-8 rounded-3xl border border-slate-200/90 shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold tracking-wide uppercase">
+            <Badge variant="info">
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
               <span>SmartWelcome Entrance Kiosk</span>
-            </div>
+            </Badge>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">
               Welcome to Our Premises
             </h1>
@@ -166,9 +167,7 @@ export const KioskView: React.FC<KioskViewProps> = ({
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-semibold text-slate-900">Entrance Presence Camera</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                Non-Biometric Tripwire
-              </span>
+              <Badge variant="neutral">Non-Biometric Tripwire</Badge>
             </div>
             <span className="text-xs text-slate-500 font-mono">Zone 01 • Main Entrance Gate</span>
           </div>
@@ -190,15 +189,12 @@ export const KioskView: React.FC<KioskViewProps> = ({
                   <p className="text-xs text-slate-500 font-mono">Wi-Fi LAN Signaling</p>
                 </div>
               </div>
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full font-medium border ${
-                  isUnoQConnected
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                    : 'bg-rose-50 border-rose-200 text-rose-700'
-                }`}
+              <Badge
+                variant={isUnoQConnected ? 'success' : 'destructive'}
+                dot={true}
               >
                 {isUnoQConnected ? 'Online & Armed' : 'Offline'}
-              </span>
+              </Badge>
             </div>
 
             <div className="space-y-2 text-xs text-slate-600">
@@ -216,20 +212,22 @@ export const KioskView: React.FC<KioskViewProps> = ({
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-slate-500">Last Verified Ack:</span>
-                <span className="font-mono text-slate-800">
+                <span className="font-mono text-slate-800 tabular-nums">
                   {latestEvent?.hardwareAckLatencyMs ? `${latestEvent.hardwareAckLatencyMs} ms` : '38 ms'}
                 </span>
               </div>
             </div>
 
             {/* Quick Test Signal Button */}
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => api.pingDevice(primaryDevice?.deviceId)}
-              className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full"
             >
               <Heart className="w-3.5 h-3.5 text-rose-500" />
               <span>Test Board LED Actuation</span>
-            </button>
+            </Button>
           </div>
 
           {/* Optional Explicit Sign-in CTA */}
@@ -247,13 +245,15 @@ export const KioskView: React.FC<KioskViewProps> = ({
               Camera presence counting is completely anonymous. If you wish to voluntarily record your attendance under
               your name, tap below.
             </p>
-            <button
+            <Button
+              variant="primary"
+              size="md"
               onClick={() => setIsCheckinModalOpen(true)}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
+              className="w-full"
             >
               <span>Record Named Attendance</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+              <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            </Button>
           </div>
         </div>
       </div>
@@ -272,12 +272,14 @@ export const KioskView: React.FC<KioskViewProps> = ({
                   <p className="text-xs text-slate-500">Explicit non-biometric entry</p>
                 </div>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setIsCheckinModalOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                className="text-slate-400 hover:text-slate-700"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             {checkinSuccessMessage ? (
@@ -316,46 +318,42 @@ export const KioskView: React.FC<KioskViewProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={personName}
-                    onChange={(e) => setPersonName(e.target.value)}
-                    placeholder={checkinType === 'staff' ? 'e.g. Alice Johnson' : 'e.g. Michael Smith'}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
-                </div>
+                <Input
+                  label="Full Name"
+                  type="text"
+                  required
+                  value={personName}
+                  onChange={(e) => setPersonName(e.target.value)}
+                  placeholder={checkinType === 'staff' ? 'e.g. Alice Johnson' : 'e.g. Michael Smith'}
+                />
 
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    {checkinType === 'staff' ? 'Department' : 'Company / Organization'}
-                  </label>
-                  <input
-                    type="text"
-                    value={departmentOrCompany}
-                    onChange={(e) => setDepartmentOrCompany(e.target.value)}
-                    placeholder={checkinType === 'staff' ? 'e.g. Engineering' : 'e.g. Acme Corp'}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
-                </div>
+                <Input
+                  label={checkinType === 'staff' ? 'Department' : 'Company / Organization'}
+                  type="text"
+                  value={departmentOrCompany}
+                  onChange={(e) => setDepartmentOrCompany(e.target.value)}
+                  placeholder={checkinType === 'staff' ? 'e.g. Engineering' : 'e.g. Acme Corp'}
+                />
 
                 <div className="pt-2 flex gap-3">
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="md"
                     onClick={() => setIsCheckinModalOpen(false)}
-                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200/70 border border-slate-200 text-slate-700 text-xs font-medium rounded-xl transition cursor-pointer"
+                    className="flex-1"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
-                    disabled={isSubmitting || !personName.trim()}
-                    className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-2xs"
+                    variant="primary"
+                    size="md"
+                    isLoading={isSubmitting}
+                    disabled={!personName.trim()}
+                    className="flex-1"
                   >
                     {isSubmitting ? 'Confirming...' : 'Confirm Attendance'}
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}

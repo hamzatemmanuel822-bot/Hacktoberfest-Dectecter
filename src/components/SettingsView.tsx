@@ -5,13 +5,10 @@
 
 import React, { useState } from 'react';
 import {
-  Settings,
   Sparkles,
   ShieldCheck,
-  Terminal,
   Save,
   Cpu,
-  Copy,
   RefreshCw,
   CheckCircle2,
   AlertTriangle,
@@ -20,6 +17,9 @@ import {
 } from 'lucide-react';
 import { SystemSettings, GemmaStatus } from '../types';
 import { api } from '../services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Input } from './ui/Input';
 
 interface SettingsViewProps {
   settings: SystemSettings | null;
@@ -142,59 +142,49 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full font-mono border ${
-                  gemmaStatus?.status === 'connected'
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                    : 'bg-slate-100 border-slate-200 text-slate-600'
-                }`}
+              <Badge
+                variant={gemmaStatus?.status === 'connected' ? 'success' : 'neutral'}
+                dot={true}
+                className="font-mono"
               >
                 {gemmaStatus?.status === 'connected' ? 'Connected (Local)' : 'Standby / Offline'}
-              </span>
-              <button
-                type="button"
+              </Badge>
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={onRefreshGemma}
-                className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 transition cursor-pointer"
                 title="Probe Local Gemma Runtime"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div>
-              <label className="block text-slate-700 font-medium mb-1">Local Model Endpoint URL</label>
-              <input
-                type="text"
-                value={formData.localGemmaEndpoint}
-                onChange={(e) => setFormData({ ...formData, localGemmaEndpoint: e.target.value })}
-                placeholder="http://localhost:11434"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
-              />
-              <span className="text-[11px] text-slate-400 mt-1 block">
-                Standard Ollama default is <code>http://localhost:11434</code>
-              </span>
-            </div>
+            <Input
+              label="Local Model Endpoint URL"
+              value={formData.localGemmaEndpoint}
+              onChange={(e) => setFormData({ ...formData, localGemmaEndpoint: e.target.value })}
+              placeholder="http://localhost:11434"
+              helperText="Standard Ollama default is http://localhost:11434"
+              className="font-mono"
+            />
 
-            <div>
-              <label className="block text-slate-700 font-medium mb-1">Exact Model Identifier</label>
-              <input
-                type="text"
-                value={formData.localGemmaModelName}
-                onChange={(e) => setFormData({ ...formData, localGemmaModelName: e.target.value })}
-                placeholder="gemma:2b"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
-              />
-              <span className="text-[11px] text-slate-400 mt-1 block">Targeting local Gemma 2B model name.</span>
-            </div>
+            <Input
+              label="Exact Model Identifier"
+              value={formData.localGemmaModelName}
+              onChange={(e) => setFormData({ ...formData, localGemmaModelName: e.target.value })}
+              placeholder="gemma:2b"
+              helperText="Targeting locally available Gemma 2B model name."
+              className="font-mono"
+            />
           </div>
 
           {/* Interactive Test Inference Console */}
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-800">Live Gemma E2B Test Inference</span>
-              <span className="text-[11px] font-mono text-blue-600">Zero Cloud Fallback</span>
+              <span className="text-[11px] font-mono text-blue-600 font-medium">Zero Cloud Fallback</span>
             </div>
 
             <div className="flex gap-2">
@@ -203,17 +193,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 value={testPrompt}
                 onChange={(e) => setTestPrompt(e.target.value)}
                 placeholder="Enter test prompt for Gemma E2B..."
-                className="flex-1 px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
+                className="flex-1 h-9 px-3.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
               />
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="sm"
                 onClick={handleTestGemmaInference}
-                disabled={isTestingGemma}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-2xs"
+                isLoading={isTestingGemma}
               >
                 <Play className="w-3.5 h-3.5" />
                 <span>{isTestingGemma ? 'Testing...' : 'Run Test'}</span>
-              </button>
+              </Button>
             </div>
 
             {gemmaTestResult && (
@@ -221,9 +212,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <div className="text-slate-800 leading-relaxed">&ldquo;{gemmaTestResult.text}&rdquo;</div>
                 <div className="text-[10px] font-mono text-blue-700 flex gap-3 pt-1">
                   <span>Model: {gemmaTestResult.model}</span>
-                  <span>Latency: {gemmaTestResult.latencyMs} ms</span>
+                  <span className="tabular-nums">Latency: {gemmaTestResult.latencyMs} ms</span>
                   {gemmaTestResult.tokensGenerated !== undefined && (
-                    <span>Tokens: {gemmaTestResult.tokensGenerated}</span>
+                    <span className="tabular-nums">Tokens: {gemmaTestResult.tokensGenerated}</span>
                   )}
                   <span className="text-emerald-700 font-semibold">Verified Local Inference</span>
                 </div>
@@ -272,7 +263,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div>
               <label className="block text-slate-700 font-medium mb-1">
-                Passage Cooldown: <span className="font-mono text-teal-700">{formData.cooldownSeconds}s</span>
+                Passage Cooldown: <span className="font-mono text-teal-700 tabular-nums">{formData.cooldownSeconds}s</span>
               </label>
               <input
                 type="range"
@@ -290,7 +281,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
             <div>
               <label className="block text-slate-700 font-medium mb-1">
-                Detection Sensitivity: <span className="font-mono text-teal-700">{formData.sensitivityThreshold}</span>
+                Detection Sensitivity: <span className="font-mono text-teal-700 tabular-nums">{formData.sensitivityThreshold}</span>
               </label>
               <input
                 type="range"
@@ -306,7 +297,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
             <div>
               <label className="block text-slate-700 font-medium mb-1">
-                Absent Reset Timeout: <span className="font-mono text-teal-700">{formData.absentTimeoutSeconds}s</span>
+                Absent Reset Timeout: <span className="font-mono text-teal-700 tabular-nums">{formData.absentTimeoutSeconds}s</span>
               </label>
               <input
                 type="range"
@@ -339,12 +330,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
 
           <div className="text-xs max-w-md">
-            <label className="block text-slate-700 font-medium mb-1">Device Authentication Bearer Token</label>
-            <input
-              type="text"
+            <Input
+              label="Device Authentication Bearer Token"
               value={formData.deviceAuthToken}
               onChange={(e) => setFormData({ ...formData, deviceAuthToken: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 focus:outline-none"
+              className="font-mono"
             />
           </div>
         </div>
@@ -369,9 +359,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   Frames are processed in browser RAM only and immediately discarded.
                 </div>
               </div>
-              <span className="font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+              <Badge variant="success" className="font-mono">
                 Permanently Disabled (0 bytes)
-              </span>
+              </Badge>
             </div>
 
             <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
@@ -381,9 +371,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   Facial recognition, embedding generation, and biometric profiles are strictly prohibited.
                 </div>
               </div>
-              <span className="font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+              <Badge variant="success" className="font-mono">
                 Non-Biometric Only
-              </span>
+              </Badge>
             </div>
 
             <div className="flex items-center justify-between pt-2">
@@ -404,14 +394,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
         {/* Submit Button */}
         <div className="flex justify-end pt-2">
-          <button
+          <Button
             type="submit"
-            disabled={isSaving}
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition flex items-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+            variant="primary"
+            size="md"
+            isLoading={isSaving}
           >
             <Save className="w-4 h-4" />
             <span>{isSaving ? 'Saving Changes...' : 'Save Configuration'}</span>
-          </button>
+          </Button>
         </div>
       </form>
     </div>

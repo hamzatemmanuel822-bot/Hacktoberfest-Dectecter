@@ -9,17 +9,15 @@ import {
   Users,
   UserCheck,
   Cpu,
-  Clock,
   Sparkles,
   TrendingUp,
   RefreshCw,
   Activity,
-  CheckCircle2,
-  AlertCircle,
-  ShieldCheck,
 } from 'lucide-react';
 import { TodayStats, PassageEvent, DeviceInfo, GemmaStatus } from '../types';
 import { api } from '../services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
 
 interface OverviewViewProps {
   stats: TodayStats | null;
@@ -75,13 +73,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             Real-time human-presence detection metrics, hardware acknowledgements, and local intelligence.
           </p>
         </div>
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={onRefresh}
-          className="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-xl border border-slate-200 shadow-2xs transition cursor-pointer self-start sm:self-auto"
+          className="self-start sm:self-auto"
         >
           <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
           <span>Refresh Data</span>
-        </button>
+        </Button>
       </div>
 
       {/* KPI Cards Grid */}
@@ -94,9 +94,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-slate-900 tracking-tight">{stats?.totalPassages ?? 0}</div>
+          <div className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
+            {stats?.totalPassages ?? 0}
+          </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span>Anonymous tripwire crossings</span>
           </div>
         </div>
@@ -109,7 +111,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <UserCheck className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-slate-900 tracking-tight">{stats?.confirmedStaff ?? 0}</div>
+          <div className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
+            {stats?.confirmedStaff ?? 0}
+          </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
             <span className="text-emerald-700 font-medium">Non-biometric</span>
             <span>explicit self-checkins</span>
@@ -124,7 +128,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <Activity className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-slate-900 tracking-tight">{stats?.confirmedVisitors ?? 0}</div>
+          <div className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
+            {stats?.confirmedVisitors ?? 0}
+          </div>
           <div className="mt-2 text-xs text-slate-500">Voluntary guest entries submitted</div>
         </div>
 
@@ -136,7 +142,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <Cpu className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold text-slate-900 tracking-tight">{stats?.ackRate ?? 100}%</div>
+          <div className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
+            {stats?.ackRate ?? 100}%
+          </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
             <span className="font-mono text-teal-700 font-medium">Avg latency: 38 ms</span>
             <span className={isUnoQOnline ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
@@ -154,17 +162,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <Sparkles className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-semibold text-slate-900">Local Gemma E2B Executive Brief</h3>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white text-blue-700 border border-blue-200 font-medium">
+            <Badge variant="info">
               {summarySource === 'local_gemma_e2b' ? 'Live Local Inference' : 'Deterministic Template'}
-            </span>
+            </Badge>
           </div>
 
           <button
             onClick={fetchSummary}
             disabled={isLoadingSummary}
-            className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition self-start sm:self-auto cursor-pointer"
+            className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1.5 transition self-start sm:self-auto cursor-pointer font-medium"
           >
-            <RefreshCw className={`w-3 h-3 ${isLoadingSummary ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingSummary ? 'animate-spin' : ''}`} />
             <span>Regenerate Summary</span>
           </button>
         </div>
@@ -231,9 +239,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <Activity className="w-4 h-4 text-emerald-600" />
               <h3 className="text-sm font-semibold text-slate-900">Live Passage Activity</h3>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <Badge variant="success" dot={true}>
               Live Feed
-            </span>
+            </Badge>
           </div>
 
           <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
@@ -266,24 +274,21 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                       </span>
                     </div>
                     <div className="text-[11px] text-slate-500 flex items-center gap-2">
-                      <span>{new Date(ev.timestamp).toLocaleTimeString()}</span>
+                      <span className="tabular-nums">{new Date(ev.timestamp).toLocaleTimeString()}</span>
                       <span>•</span>
                       <span>Confidence: {ev.confidence ? `${Math.round(ev.confidence * 100)}%` : 'N/A'}</span>
                     </div>
                   </div>
 
                   <div className="flex flex-col items-end gap-1">
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded font-mono font-medium ${
-                        ev.processingStatus === 'acknowledged'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
-                      }`}
+                    <Badge
+                      variant={ev.processingStatus === 'acknowledged' ? 'success' : 'warning'}
+                      className="font-mono text-[10px]"
                     >
                       {ev.processingStatus === 'acknowledged'
                         ? `ACK: ${ev.hardwareAckLatencyMs || 38}ms`
                         : ev.processingStatus}
-                    </span>
+                    </Badge>
                   </div>
                 </div>
               ))

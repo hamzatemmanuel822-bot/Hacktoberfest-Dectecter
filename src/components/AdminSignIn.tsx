@@ -23,6 +23,9 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { AdminUser } from '../types';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Badge } from './ui/Badge';
 
 interface AdminSignInProps {
   onAuthenticated: (user: AdminUser) => void;
@@ -59,7 +62,6 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
       .then((res) => {
         if (mounted) {
           setIsSetupRequired(res.isSetupRequired);
-          // If no admin user exists, default directly to Sign Up mode!
           if (res.isSetupRequired) {
             setMode('signup');
           }
@@ -163,27 +165,27 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
           </div>
           <div className="flex items-center gap-1.5">
             <span className="font-semibold text-slate-900 text-base tracking-tight">SmartWelcome</span>
-            <span className="text-[11px] font-medium font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-              AI
-            </span>
+            <Badge variant="info">AI</Badge>
           </div>
         </div>
 
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={onOpenKiosk}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-blue-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition shadow-2xs cursor-pointer"
+          className="gap-1.5"
         >
           <Tv className="w-3.5 h-3.5 text-slate-500" />
           <span>Launch Entrance Kiosk</span>
-        </button>
+        </Button>
       </header>
 
       {/* Main Authentication Card */}
       <main className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-[430px] bg-white border border-slate-200/90 rounded-2xl shadow-sm p-7 sm:p-9 space-y-6">
+        <div className="w-full max-w-[430px] bg-white border border-slate-200/90 rounded-2xl shadow-xs p-7 sm:p-9 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mx-auto shadow-2xs">
+            <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mx-auto shadow-2xs">
               {mode === 'signup' ? <UserPlus className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
             </div>
             <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
@@ -261,7 +263,7 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
           {lockoutSeconds > 0 && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
               Account locked for security. Retry available in{' '}
-              <strong className="font-mono">{lockoutSeconds}s</strong>.
+              <strong className="font-mono tabular-nums">{lockoutSeconds}s</strong>.
             </div>
           )}
 
@@ -273,89 +275,74 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
           ) : mode === 'signup' ? (
             /* SIGN UP / REGISTRATION FORM */
             <form onSubmit={handleSignUp} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                  <input
-                    type="text"
-                    required
-                    autoFocus
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Lead Administrator"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
-                </div>
-              </div>
+              <Input
+                label="Full Name"
+                type="text"
+                required
+                autoFocus
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Lead Administrator"
+                leftIcon={<User className="w-4 h-4" />}
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Username</label>
-                <input
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
-                  className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition font-mono"
-                />
-              </div>
+              <Input
+                label="Username"
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                className="font-mono"
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Email Address (Optional)</label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@smartwelcome.local"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
-                </div>
-              </div>
+              <Input
+                label="Email Address (Optional)"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@smartwelcome.local"
+                leftIcon={<Mail className="w-4 h-4" />}
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 8 chars (letters and numbers)"
-                    className="w-full pl-3.5 pr-10 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
+              <Input
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min 8 chars (letters and numbers)"
+                rightIcon={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                </div>
-              </div>
+                }
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Confirm Password</label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                />
-              </div>
+              <Input
+                label="Confirm Password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+              />
 
-              <button
+              <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                variant="primary"
+                size="md"
+                isLoading={isLoading}
+                className="w-full mt-2"
               >
                 <span>{isLoading ? 'Creating Account...' : 'Create Admin Account & Sign In'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
 
               <div className="text-center pt-2">
                 <button
@@ -370,50 +357,36 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
           ) : (
             /* SIGN IN FORM */
             <form onSubmit={handleSignIn} className="space-y-4">
-              <div>
-                <label htmlFor="username-field" className="block text-xs font-medium text-slate-700 mb-1">
-                  Username or Email
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                  <input
-                    id="username-field"
-                    type="text"
-                    required
-                    autoFocus
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter administrator username or email"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
-                </div>
-              </div>
+              <Input
+                label="Username or Email"
+                type="text"
+                required
+                autoFocus
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter administrator username or email"
+                leftIcon={<User className="w-4 h-4" />}
+              />
 
-              <div>
-                <label htmlFor="password-field" className="block text-xs font-medium text-slate-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                  <input
-                    id="password-field"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
-                  />
+              <Input
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                leftIcon={<Lock className="w-4 h-4" />}
+                rightIcon={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
+                    className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                </div>
-              </div>
+                }
+              />
 
               <div className="flex items-center justify-between text-xs pt-1">
                 <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
@@ -427,14 +400,17 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
                 </label>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={isLoading || lockoutSeconds > 0}
-                className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl transition shadow-xs cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 pt-2.5"
+                variant="primary"
+                size="md"
+                isLoading={isLoading}
+                disabled={lockoutSeconds > 0}
+                className="w-full"
               >
                 <span>{isLoading ? 'Signing In...' : 'Sign In to Portal'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
 
               <div className="text-center pt-2">
                 <button
@@ -452,7 +428,7 @@ export const AdminSignIn: React.FC<AdminSignInProps> = ({ onAuthenticated, onOpe
           <div className="pt-4 border-t border-slate-100 flex items-start gap-2.5 text-[11px] text-slate-400 leading-normal">
             <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
             <span>
-              <strong>Hardened Access Control:</strong> Credentials are encrypted with Scrypt key derivation. Presence
+              <strong className="text-slate-600 font-medium">Hardened Access Control:</strong> Credentials are encrypted with Scrypt key derivation. Presence
               detections remain strictly non-biometric.
             </span>
           </div>

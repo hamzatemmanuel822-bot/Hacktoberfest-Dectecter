@@ -6,9 +6,12 @@
  */
 
 import React, { useState } from 'react';
-import { Search, Download, Clock, UserCheck, CheckCircle2, Trash2, Calendar, AlertCircle } from 'lucide-react';
+import { Search, Download, Clock, UserCheck, CheckCircle2, Trash2, AlertCircle } from 'lucide-react';
 import { PassageEvent } from '../types';
 import { api } from '../services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Input } from './ui/Input';
 
 interface AttendanceViewProps {
   events: PassageEvent[];
@@ -102,37 +105,29 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
     switch (type) {
       case 'person_passage':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+          <Badge variant="info">
             <Clock className="w-3 h-3 text-blue-600" />
             Person Passage
-          </span>
+          </Badge>
         );
       case 'staff_attendance_confirmed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <Badge variant="success">
             <UserCheck className="w-3 h-3 text-emerald-600" />
             Staff Confirmed
-          </span>
+          </Badge>
         );
       case 'visitor_attendance_confirmed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
-            <CheckCircle2 className="w-3 h-3 text-purple-600" />
+          <Badge variant="warning">
+            <CheckCircle2 className="w-3 h-3 text-amber-600" />
             Visitor Confirmed
-          </span>
+          </Badge>
         );
       case 'person_detected':
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
-            Presence Frame
-          </span>
-        );
+        return <Badge variant="neutral">Presence Frame</Badge>;
       default:
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-            {type}
-          </span>
-        );
+        return <Badge variant="neutral">{type}</Badge>;
     }
   };
 
@@ -149,31 +144,35 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
 
         <div className="flex items-center gap-2">
           {events.length > 0 && (
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setShowClearConfirm(true)}
               disabled={isClearing}
-              className="px-3.5 py-2 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-xl text-xs font-medium text-slate-700 hover:text-rose-700 shadow-2xs transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="hover:border-rose-300 hover:text-rose-700 hover:bg-rose-50"
             >
-              <Trash2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-rose-600" />
+              <Trash2 className="w-3.5 h-3.5 text-slate-400" />
               <span>Clear History</span>
-            </button>
+            </Button>
           )}
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={exportCsv}
             disabled={events.length === 0}
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 shadow-2xs transition flex items-center gap-2 cursor-pointer disabled:opacity-40"
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Export CSV</span>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={exportJson}
             disabled={events.length === 0}
-            className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 shadow-2xs transition flex items-center gap-2 cursor-pointer disabled:opacity-40"
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Export JSON</span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -186,24 +185,26 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
             </div>
             <div>
               <h3 className="text-sm font-semibold text-slate-900">Clear Attendance History?</h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                 This will delete all logged passage events and attendance confirmations from the database. This action cannot be undone.
               </p>
             </div>
             <div className="flex items-center justify-end gap-2 pt-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setShowClearConfirm(false)}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
                 onClick={handleClearHistory}
-                disabled={isClearing}
-                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
+                isLoading={isClearing}
               >
                 {isClearing ? 'Clearing...' : 'Clear All'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -212,14 +213,12 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
       {/* Filter and Search Bar */}
       <div className="bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
         {/* Search */}
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-          <input
-            type="text"
+        <div className="w-full md:w-80">
+          <Input
             placeholder="Search by event ID, name, department..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
+            leftIcon={<Search className="w-4 h-4" />}
           />
         </div>
 
@@ -286,8 +285,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
                     <td className="px-5 py-3.5 font-mono text-slate-600 whitespace-nowrap">{e.id}</td>
                     <td className="px-5 py-3.5 whitespace-nowrap">{getEventBadge(e.eventType)}</td>
                     <td className="px-5 py-3.5 text-slate-700 whitespace-nowrap">
-                      <div>{new Date(e.timestamp).toLocaleTimeString()}</div>
-                      <div className="text-[10px] text-slate-400">{new Date(e.timestamp).toLocaleDateString()}</div>
+                      <div className="tabular-nums">{new Date(e.timestamp).toLocaleTimeString()}</div>
+                      <div className="text-[10px] text-slate-400 tabular-nums">{new Date(e.timestamp).toLocaleDateString()}</div>
                     </td>
                     <td className="px-5 py-3.5">
                       {e.metadata?.personName ? (
@@ -305,18 +304,15 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ events, onRefres
                         : 'Tripwire (Optic)'}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
-                          e.processingStatus === 'acknowledged'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}
+                      <Badge
+                        variant={e.processingStatus === 'acknowledged' ? 'success' : 'warning'}
+                        dot={true}
+                        className="font-mono text-[10px]"
                       >
-                        <CheckCircle2 className="w-3 h-3" />
                         {e.processingStatus}
-                      </span>
+                      </Badge>
                     </td>
-                    <td className="px-5 py-3.5 font-mono text-slate-600">
+                    <td className="px-5 py-3.5 font-mono text-slate-600 tabular-nums">
                       {e.hardwareAckLatencyMs ? `${e.hardwareAckLatencyMs} ms` : '—'}
                     </td>
                   </tr>

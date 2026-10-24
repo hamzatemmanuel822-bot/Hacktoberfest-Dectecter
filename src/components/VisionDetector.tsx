@@ -343,10 +343,10 @@ export const VisionDetector: React.FC<VisionDetectorProps> = ({
             {/* Live Detection Status Badge */}
             <div className="flex items-center gap-2">
               <div
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border text-xs font-medium shadow-lg transition-all ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg backdrop-blur-md border text-xs font-medium shadow-lg transition-all ${
                   isHumanPresent
                     ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300'
-                    : 'bg-slate-900/80 border-slate-700 text-slate-400'
+                    : 'bg-slate-900/80 border-slate-700 text-slate-300'
                 }`}
               >
                 <span
@@ -357,15 +357,15 @@ export const VisionDetector: React.FC<VisionDetectorProps> = ({
                 <span>{isHumanPresent ? 'Human Presence Detected' : 'Corridor Clear / Monitoring'}</span>
               </div>
 
-              {/* Cooldown Suppression Pill */}
+              {/* Cooldown Suppression Badge */}
               {cooldownRemaining > 0 && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-mono font-medium backdrop-blur-md animate-pulse">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-mono font-medium backdrop-blur-md animate-pulse">
                   <span>Cooldown: {cooldownRemaining}s</span>
                 </div>
               )}
             </div>
 
-            {/* Privacy Shield Pill */}
+            {/* Privacy Shield Toggle */}
             <div className="flex items-center gap-2 pointer-events-auto">
               <button
                 onClick={() => setPrivacyBlur(!privacyBlur)}

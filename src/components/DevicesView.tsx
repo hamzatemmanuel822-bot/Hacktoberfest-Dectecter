@@ -13,11 +13,11 @@ import {
   Terminal,
   Zap,
   CheckCircle2,
-  AlertCircle,
-  HelpCircle,
 } from 'lucide-react';
 import { DeviceInfo } from '../types';
 import { api } from '../services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
 
 interface DevicesViewProps {
   devices: DeviceInfo[];
@@ -77,14 +77,16 @@ export const DevicesView: React.FC<DevicesViewProps> = ({ devices, onRefresh }) 
           </p>
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           onClick={handleTestPing}
-          disabled={isPinging}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-xs disabled:opacity-50"
+          isLoading={isPinging}
+          className="self-start sm:self-auto"
         >
           <Zap className="w-3.5 h-3.5" />
           <span>{isPinging ? 'Pinging Board...' : 'Test LED Actuation'}</span>
-        </button>
+        </Button>
       </div>
 
       {/* Main Grid: Interactive Board Simulator on Left + Device Telemetry on Right */}
@@ -96,9 +98,9 @@ export const DevicesView: React.FC<DevicesViewProps> = ({ devices, onRefresh }) 
               <Cpu className="w-4 h-4 text-teal-600" />
               <h2 className="text-sm font-semibold text-slate-900">Interactive UNO Q Hardware Simulation</h2>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+            <Badge variant="info" dot={true}>
               Live Bridge Monitor
-            </span>
+            </Badge>
           </div>
 
           {/* Graphical Board Canvas representation */}
@@ -181,20 +183,24 @@ export const DevicesView: React.FC<DevicesViewProps> = ({ devices, onRefresh }) 
 
           {/* Quick Actuation Buttons */}
           <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
+            <Button
+              variant="secondary"
+              size="md"
               onClick={handleTestPing}
-              className="py-2.5 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              className="w-full"
             >
               <Play className="w-3.5 h-3.5 text-blue-600" />
               <span>Simulate Passage Signal</span>
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="md"
               onClick={handleTestConfirmedPulse}
-              className="py-2.5 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              className="w-full"
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>Simulate Confirmed Check-in</span>
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -203,9 +209,9 @@ export const DevicesView: React.FC<DevicesViewProps> = ({ devices, onRefresh }) 
           <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-sm font-semibold text-slate-900">Registered UNO Q Board</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <Badge variant="success" dot={true} className="font-mono">
                 {primaryDevice?.status || 'Online'}
-              </span>
+              </Badge>
             </div>
 
             <div className="space-y-2.5 text-xs">
@@ -227,11 +233,11 @@ export const DevicesView: React.FC<DevicesViewProps> = ({ devices, onRefresh }) 
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500">Total Physical Acks:</span>
-                <span className="font-mono text-emerald-700 font-bold">{primaryDevice?.totalAcks ?? 24}</span>
+                <span className="font-mono text-emerald-700 font-bold tabular-nums">{primaryDevice?.totalAcks ?? 24}</span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-slate-500">Last Heartbeat:</span>
-                <span className="font-mono text-slate-500">
+                <span className="font-mono text-slate-500 tabular-nums">
                   {primaryDevice?.lastHeartbeat ? new Date(primaryDevice.lastHeartbeat).toLocaleTimeString() : 'Just now'}
                 </span>
               </div>
@@ -252,7 +258,7 @@ export const DevicesView: React.FC<DevicesViewProps> = ({ devices, onRefresh }) 
                     'agent-cmd'
                   )
                 }
-                className="text-[11px] text-blue-600 hover:text-blue-800 flex items-center gap-1 transition cursor-pointer"
+                className="text-[11px] text-blue-600 hover:text-blue-800 flex items-center gap-1 transition cursor-pointer font-medium"
               >
                 <Copy className="w-3 h-3" />
                 <span>{copiedCode === 'agent-cmd' ? 'Copied!' : 'Copy'}</span>

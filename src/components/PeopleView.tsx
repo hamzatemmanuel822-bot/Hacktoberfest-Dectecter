@@ -5,9 +5,12 @@
  */
 
 import React, { useState } from 'react';
-import { UserCheck, UserPlus, Search, Building2, Check, CheckCircle2, X, Users, Trash2, AlertCircle } from 'lucide-react';
+import { UserPlus, Search, Building2, Check, X, Users, Trash2, CheckCircle2 } from 'lucide-react';
 import { PersonRecord, PassageEvent } from '../types';
 import { api } from '../services/api';
+import { Button } from './ui/Button';
+import { Badge } from './ui/Badge';
+import { Input } from './ui/Input';
 
 interface PeopleViewProps {
   people: PersonRecord[];
@@ -113,13 +116,15 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
           </p>
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-xs"
+          className="self-start sm:self-auto"
         >
           <UserPlus className="w-3.5 h-3.5" />
           <span>Register Person</span>
-        </button>
+        </Button>
       </div>
 
       {successMessage && (
@@ -131,14 +136,12 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
 
       {/* Filter and Search Bar */}
       <div className="bg-white border border-slate-200/90 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-          <input
-            type="text"
+        <div className="w-full md:w-80">
+          <Input
             placeholder="Search directory by name, badge ID, department..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition"
+            leftIcon={<Search className="w-4 h-4" />}
           />
         </div>
 
@@ -174,13 +177,14 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
               : 'Try clearing your search term or switching the type filter tab.'}
           </p>
           {people.length === 0 && (
-            <button
+            <Button
+              variant="primary"
+              size="md"
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-xs"
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>Register First Person</span>
-            </button>
+            </Button>
           )}
         </div>
       ) : (
@@ -199,15 +203,9 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
                       <span>{person.departmentOrCompany || 'General'}</span>
                     </div>
                   </div>
-                  <span
-                    className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                      person.type === 'staff'
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                        : 'bg-purple-50 border-purple-200 text-purple-700'
-                    }`}
-                  >
+                  <Badge variant={person.type === 'staff' ? 'success' : 'warning'}>
                     {person.type}
-                  </span>
+                  </Badge>
                 </div>
 
                 {person.identifier && (
@@ -218,26 +216,29 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
               </div>
 
               <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="text-[11px] text-slate-400 font-mono tabular-nums">
                   {new Date(person.createdAt).toLocaleDateString()}
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDeletePerson(person.id, person.name)}
                     disabled={deletingId === person.id}
                     title="Remove from directory"
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer disabled:opacity-40"
+                    className="text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => handleQuickCheckin(person)}
-                    disabled={checkingInId === person.id}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-2xs"
+                    isLoading={checkingInId === person.id}
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>{checkingInId === person.id ? 'Logging...' : 'Check In'}</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -251,17 +252,19 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
           <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-base font-semibold text-slate-900">Register New Person</h2>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                className="text-slate-400 hover:text-slate-700"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={handleCreatePerson} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 font-medium mb-1">Person Type</label>
+                <label className="block text-slate-700 font-medium mb-1.5">Person Type</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -288,55 +291,49 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-700 font-medium mb-1">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Maria Gonzalez"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
-                />
-              </div>
+              <Input
+                label="Full Name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Maria Gonzalez"
+              />
 
-              <div>
-                <label className="block text-slate-700 font-medium mb-1">Badge or Staff ID (Optional)</label>
-                <input
-                  type="text"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="e.g. STF-4402"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
-                />
-              </div>
+              <Input
+                label="Badge or Staff ID (Optional)"
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="e.g. STF-4402"
+              />
 
-              <div>
-                <label className="block text-slate-700 font-medium mb-1">Department / Organization</label>
-                <input
-                  type="text"
-                  value={departmentOrCompany}
-                  onChange={(e) => setDepartmentOrCompany(e.target.value)}
-                  placeholder="e.g. Operations or Acme Partner Corp"
-                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:outline-none"
-                />
-              </div>
+              <Input
+                label="Department / Organization"
+                type="text"
+                value={departmentOrCompany}
+                onChange={(e) => setDepartmentOrCompany(e.target.value)}
+                placeholder="e.g. Operations or Acme Partner Corp"
+              />
 
               <div className="pt-2 flex gap-3">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="md"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200/70 border border-slate-200 rounded-xl text-slate-700 font-medium cursor-pointer"
+                  className="flex-1"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="primary"
+                  size="md"
                   disabled={!name.trim()}
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl cursor-pointer disabled:opacity-50 shadow-2xs"
+                  className="flex-1"
                 >
                   Save Record
-                </button>
+                </Button>
               </div>
             </form>
           </div>
